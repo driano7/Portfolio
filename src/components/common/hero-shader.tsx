@@ -75,88 +75,79 @@ void main() {
   float breath = sin(t * 0.28) * 0.045;
 
   // Domain warping for organic liquid eddies
-  float warp1 = vnoise(vec2(u_scaled * 1.15 + t * 0.07, v_scaled * 1.15 - t * 0.06)) * 0.09;
-  float warp2 = vnoise(vec2(u_scaled * 1.25 - t * 0.06, v_scaled * 1.25 + t * 0.07)) * 0.08;
-  float warp3 = vnoise(vec2(u_scaled * 1.05 + t * 0.05, v_scaled * 0.95 - t * 0.04)) * 0.10;
+  float warp = vnoise(vec2(u_scaled * 1.0 + t * 0.05, v_scaled * 1.0 - t * 0.04)) * 0.10;
 
-  // --- WAVE 1: Left quadrant (vertical curve) ---
-  float wave1_base = mix(-0.50, -0.32, isPortrait);
-  float curve1_x = wave1_base - breath + 0.21 * cos(v_scaled * 2.7 + t * 0.14)
-                   + 0.07 * sin(v_scaled * 4.1 - t * 0.09) + warp1;
-  float d1 = u_scaled - curve1_x;
+  // --- CIRCLE PATTERN: ondas distribuidas en anillo alrededor del centro ---
+  // Usamos coordenadas polares para colocar ondas en un círculo
+  float angle = atan(v_scaled, u_scaled);
+  float radius = length(vec2(u_scaled, v_scaled));
+  
+  // Radio del anillo donde viven las ondas
+  float ringRadius = 0.45;
+  float ringWidth = 0.08;
 
-  // --- WAVE 2: Lower-right quadrant (horizontal curve) ---
-  float wave2_base = mix(0.24, 0.26, isPortrait);
-  float curve2_y = wave2_base + breath + 0.17 * sin(u_scaled * 2.2 - t * 0.15)
-                   + 0.06 * cos(u_scaled * 1.2 + t * 0.11) + warp2;
-  float d2 = v_scaled - curve2_y;
-  float mask2 = clamp((u_scaled + mix(0.35, 0.30, isPortrait)) * 1.8, 0.0, 1.0);
+  // 3 ondas en el anillo (ángulos 0°, 120°, 240°)
+  float waveCount = 3.0;
+  
+  // Cada onda tiene su propia fase temporal para movimiento orgánico
+  float waveA = sin(t * 0.2 + 0.0) * 0.15;    // desplazamiento angular
+  float waveB = sin(t * 0.18 + 2.1) * 0.15;    // desplazamiento angular
+  float waveC = sin(t * 0.22 + 4.2) * 0.15;    // desplazamiento angular
 
-  // --- WAVE 3: Top center (horizontal curve, completes the triangle) ---
-  float wave3_base = mix(-0.32, -0.22, isPortrait);
-  float curve3_y = wave3_base + breath + 0.16 * cos(u_scaled * 2.0 + t * 0.13)
-                   + 0.05 * sin(u_scaled * 3.4 - t * 0.10) + warp3;
-  float d3 = v_scaled - curve3_y;
-  float mask3 = clamp((-v_scaled + 0.18) * 2.2, 0.0, 1.0);
+  // Ángulos base de las ondas
+  float baseAngles[3] = float[3](0.0, 2.094, 4.189); // 0°, 120°, 240° en radianes
 
-  // Brand colors: Purple, Blue, White
-  vec3 PURPLE   = vec3(0.482, 0.169, 0.851); // #7B2BD9
-  vec3 CORE_WHITE = vec3(0.985, 0.995, 1.000);
-  vec3 ELEC_BLUE  = vec3(0.237, 0.510, 0.969); // #3C82F7-ish
-  vec3 BG_LIGHT   = vec3(0.980, 0.957, 0.925); // bone white
+  // Distancia a cada onda del anillo
+  float d_ring = abs(radius - ringRadius);
+  
+  // Cada onda es un segmento del anillo con su propio color y forma
+  float totalRing = 0.0;
+  
+  for (int i = 0; i < 3; i++) {
+    float targetAngle = baseAngles[i] + (i == 0 ? waveA : i == 1 ? waveB : waveC);
+    float angleDiff = abs(angle - targetAngle);
+    // Wrap angle diff
+    angleDiff = min(angleDiff, 6.283 - angleDiff);
+    
+    // La onda es una "mancha" en el anillo
+    float waveMask = exp(-pow(d_ring / ringWidth, 2.0)) * exp(-pow(angleDiff / 0.5, 2.0));
+    totalRing += waveMask;
+  }
 
-  // Wave 1 fields
-  float core1 = exp(-pow(d1 / 0.024, 2.0));
-  float coreHalo1 = exp(-pow(d1 / 0.058, 2.0)) * 0.55;
+  // Colores por onda del círculo
+  vec3 ringPurple = vec3(0.482, 0.169, 0.851); // #7B2BD9
+  vec3 ringBlue = vec3(0.237, 0.510, 0.969);   // #3C82F7-ish
+  vec3 ringWhite = vec3(0.985, 0.995, 1.000);
 
-  float purpleLip1 = exp(-pow((d1 + 0.042) / 0.038, 2.0)) * 0.95
-                + exp(-pow((d1 + 0.078) / 0.055, 2.0)) * 0.35;
+  // Análisis de colores por segmento del anillo (variación cromática alrededor)
+  float segmentAngle = mod(angle + t * 0.1, 6.283);
+  float colorShift = sin(segmentAngle * 3.0) * 0.5 + 0.5;
 
-  float blueBody1 = exp(-pow((d1 - 0.055) / 0.065, 2.0)) * 0.95
-               + exp(-pow((d1 - 0.130) / 0.100, 2.0)) * 0.70
-               + exp(-pow((d1 - 0.240) / 0.150, 2.0)) * 0.30;
-
-  // Wave 2 fields
-  float core2 = exp(-pow(d2 / 0.025, 2.0)) * mask2;
-  float coreHalo2 = exp(-pow(d2 / 0.060, 2.0)) * 0.55 * mask2;
-
-  float blueBody2 = (exp(-pow((d2 + 0.055) / 0.065, 2.0)) * 0.95
-                  + exp(-pow((d2 + 0.130) / 0.110, 2.0)) * 0.65
-                  + exp(-pow((d2 + 0.230) / 0.160, 2.0)) * 0.25) * mask2;
-
-  float purpleLip2 = (exp(-pow((d2 - 0.040) / 0.040, 2.0)) * 0.85
-                   + exp(-pow((d2 - 0.075) / 0.060, 2.0)) * 0.25) * mask2;
-
-  // Wave 3 fields (top)
-  float core3 = exp(-pow(d3 / 0.026, 2.0)) * mask3;
-  float coreHalo3 = exp(-pow(d3 / 0.064, 2.0)) * 0.55 * mask3;
-
-  float purpleLip3 = (exp(-pow((d3 - 0.045) / 0.042, 2.0)) * 0.90
-                   + exp(-pow((d3 + 0.070) / 0.058, 2.0)) * 0.30) * mask3;
-
-  float blueBody3 = (exp(-pow((d3 + 0.050) / 0.068, 2.0)) * 0.95
-                  + exp(-pow((d3 + 0.120) / 0.105, 2.0)) * 0.60
-                  + exp(-pow((d3 + 0.210) / 0.155, 2.0)) * 0.28) * mask3;
+  // Colores del anillo: púrpura en un lado, azul en otro, blanco como halo
+  vec3 ringCol = mix(ringPurple, ringBlue, colorShift);
 
   // --- Máscara radial: centro libre para el texto (hero limpio) ---
   float centerDist = length(p);
   float centerMask = 1.0 - smoothstep(0.28, 0.55, centerDist); // 1 en centro, 0 en bordes
 
-  // --- Dark Mode Rendering (Luminous waves over pure black) ---
+  // --- Dark Mode Rendering (Luminous ring over pure black) ---
   vec3 colDark = vec3(0.0);
-  colDark += CORE_WHITE * (core1 * 1.25 + coreHalo1 * 0.6 + core2 * 1.25 + coreHalo2 * 0.6 + core3 * 1.25 + coreHalo3 * 0.6) * centerMask;
-  colDark += PURPLE * (purpleLip1 + purpleLip2 + purpleLip3) * centerMask;
-  float totalBlue = blueBody1 + blueBody2 + blueBody3;
-  colDark += ELEC_BLUE * vec3(totalBlue * 0.85, totalBlue * 0.85, totalBlue * 1.05) * centerMask;
+  // Anillo luminoso con halo
+  colDark += ringWhite * totalRing * 1.5 * centerMask;
+  colDark += ringCol * totalRing * 1.2 * centerMask;
+  // Halo externo suave
+  colDark += ringCol * exp(-pow(d_ring / 0.16, 2.0)) * 0.5 * centerMask;
+  // Resplandor azul tenue en el interior del anillo
+  colDark += vec3(0.1, 0.2, 0.4) * exp(-pow(d_ring / 0.3, 2.0)) * 0.3 * centerMask;
 
-  // --- Light Mode Rendering (Atmospheric luminous ribbons over warm bone) ---
+  // --- Light Mode Rendering (Atmospheric ring over warm bone) ---
   vec3 colLight = BG_LIGHT;
-  // Blend blue fluid body
-  colLight = mix(colLight, vec3(0.08, 0.38, 0.90), clamp(totalBlue * 0.55 * centerMask, 0.0, 1.0));
-  // Blend purple accent rim
-  colLight = mix(colLight, PURPLE, clamp((purpleLip1 + purpleLip2 + purpleLip3) * 0.65 * centerMask, 0.0, 1.0));
-  // Blend luminous core highlight
-  colLight = mix(colLight, vec3(1.0, 1.0, 1.0), clamp((core1 + core2 + core3) * 0.8 * centerMask, 0.0, 1.0));
+  // Anillo azul translúcido
+  colLight = mix(colLight, vec3(0.05, 0.25, 0.7), clamp(totalRing * 0.6, 0.0, 1.0));
+  // Anillo púrpura como borde
+  colLight = mix(colLight, ringPurple, clamp(totalRing * 0.5, 0.0, 1.0));
+  // Luminoso núcleo del anillo
+  colLight = mix(colLight, vec3(1.0, 1.0, 1.0), clamp(totalRing * 0.9, 0.0, 1.0));
 
   // --- Smooth atmospheric transition between dark and light ---
   vec3 col = mix(colDark, colLight, u_themeProgress);
