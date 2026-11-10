@@ -19,12 +19,14 @@ export function GlassDark({
   bg?: string;
   shadow?: string;
 }) {
-  const blurMap: Record<GlassBlur, string> = {
+  // Solo backdrop-blur (fondo). Nunca aplicamos el filtro `blur` directamente,
+  // porque eso borra también a los hijos (texto, imágenes, botones).
+  const backdropBlurMap: Record<GlassBlur, string> = {
     none: "",
-    sm: "blur-sm backdrop-blur-sm",
-    md: "blur backdrop-blur-md",
-    xl: "blur-xl backdrop-blur-xl",
-    "2xl": "blur-[20px] backdrop-blur-[20px]",
+    sm: "backdrop-blur-sm",
+    md: "backdrop-blur-md",
+    xl: "backdrop-blur-xl",
+    "2xl": "backdrop-blur-[20px]",
   };
 
   return (
@@ -34,7 +36,7 @@ export function GlassDark({
         border,
         bg,
         shadow,
-        blurMap[blur],
+        backdropBlurMap[blur],
         className,
       )}
     >
