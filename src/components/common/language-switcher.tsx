@@ -27,7 +27,6 @@ export function LanguageSwitcher() {
       aria-label={nextLocale === "en" ? t("switchToEnglish") : t("switchToSpanish")}
     >
       <Languages className="h-4 w-4" />
-      {nextLocale.toUpperCase()}
     </Button>
   );
 }

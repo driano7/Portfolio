@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { motion, useReducedMotion } from "framer-motion";
+import { UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
@@ -75,7 +76,7 @@ export function MobileDocNav() {
             compact ? "px-1.5" : "px-2",
           )}
         >
-          {/* Nombre como home */}
+          {/* Nombre como home (solo icono) */}
           <motion.div
             initial={reducedMotion ? false : { opacity: 0, x: -18, filter: "blur(8px)" }}
             animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
@@ -88,9 +89,7 @@ export function MobileDocNav() {
               className={MOBILE_CONTROL}
               aria-label={t("home")}
             >
-              <span className="text-[9px] font-medium leading-none text-zinc-900 dark:text-zinc-100">
-                Donovan Riaño
-              </span>
+              <UserRound className="h-5 w-5" />
             </Link>
           </motion.div>
 

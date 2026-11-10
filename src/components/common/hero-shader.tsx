@@ -138,21 +138,25 @@ void main() {
                   + exp(-pow((d3 + 0.120) / 0.105, 2.0)) * 0.60
                   + exp(-pow((d3 + 0.210) / 0.155, 2.0)) * 0.28) * mask3;
 
+  // --- Máscara radial: centro libre para el texto (hero limpio) ---
+  float centerDist = length(p);
+  float centerMask = 1.0 - smoothstep(0.28, 0.55, centerDist); // 1 en centro, 0 en bordes
+
   // --- Dark Mode Rendering (Luminous waves over pure black) ---
   vec3 colDark = vec3(0.0);
-  colDark += CORE_WHITE * (core1 * 1.25 + coreHalo1 * 0.6 + core2 * 1.25 + coreHalo2 * 0.6 + core3 * 1.25 + coreHalo3 * 0.6);
-  colDark += PURPLE * (purpleLip1 + purpleLip2 + purpleLip3);
+  colDark += CORE_WHITE * (core1 * 1.25 + coreHalo1 * 0.6 + core2 * 1.25 + coreHalo2 * 0.6 + core3 * 1.25 + coreHalo3 * 0.6) * centerMask;
+  colDark += PURPLE * (purpleLip1 + purpleLip2 + purpleLip3) * centerMask;
   float totalBlue = blueBody1 + blueBody2 + blueBody3;
-  colDark += ELEC_BLUE * vec3(totalBlue * 0.85, totalBlue * 0.85, totalBlue * 1.05);
+  colDark += ELEC_BLUE * vec3(totalBlue * 0.85, totalBlue * 0.85, totalBlue * 1.05) * centerMask;
 
   // --- Light Mode Rendering (Atmospheric luminous ribbons over warm bone) ---
   vec3 colLight = BG_LIGHT;
   // Blend blue fluid body
-  colLight = mix(colLight, vec3(0.08, 0.38, 0.90), clamp(totalBlue * 0.55, 0.0, 1.0));
+  colLight = mix(colLight, vec3(0.08, 0.38, 0.90), clamp(totalBlue * 0.55 * centerMask, 0.0, 1.0));
   // Blend purple accent rim
-  colLight = mix(colLight, PURPLE, clamp((purpleLip1 + purpleLip2 + purpleLip3) * 0.65, 0.0, 1.0));
+  colLight = mix(colLight, PURPLE, clamp((purpleLip1 + purpleLip2 + purpleLip3) * 0.65 * centerMask, 0.0, 1.0));
   // Blend luminous core highlight
-  colLight = mix(colLight, vec3(1.0, 1.0, 1.0), clamp((core1 + core2 + core3) * 0.8, 0.0, 1.0));
+  colLight = mix(colLight, vec3(1.0, 1.0, 1.0), clamp((core1 + core2 + core3) * 0.8 * centerMask, 0.0, 1.0));
 
   // --- Smooth atmospheric transition between dark and light ---
   vec3 col = mix(colDark, colLight, u_themeProgress);
