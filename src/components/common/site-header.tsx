@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState, useCallback } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Blocks, FolderGit2, UserRound } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { BlogControls } from "@/components/common/blog-controls";
@@ -14,35 +13,27 @@ type SiteHeaderProps = {
   className?: string;
 };
 
-type NavItem = {
-  href: string;
-  labelKey: "about" | "web3" | "projects";
-  icon: typeof UserRound;
-};
-
-const navItems: NavItem[] = [
-  { href: "/about", labelKey: "about", icon: UserRound },
-  { href: "/web3", labelKey: "web3", icon: Blocks },
-  { href: "/projects", labelKey: "projects", icon: FolderGit2 },
-];
-
 export function SiteHeader({ className }: SiteHeaderProps) {
   const pathname = usePathname();
   const t = useTranslations("nav");
   const shouldReduceMotion = useReducedMotion();
+
+  // Evitar mismatch de hidratación: inicializar basado en el cliente real
+  const [isClient, setIsClient] = useState(false);
   const [atTop, setAtTop] = useState(true);
 
-  const navLabel = (labelKey: NavItem["labelKey"]) => {
-    if (labelKey !== "web3") return t(labelKey);
-    return t("web3Desktop");
-  };
-
   useEffect(() => {
+    setIsClient(true);
     const handleScroll = () => setAtTop(window.scrollY <= 24);
     handleScroll();
     window.addEventListener("scroll", handleScroll, { passive: true });
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  // Mientras no estamos en el cliente, no renderizar nada (evita parpadeo y mismatch)
+  if (!isClient) {
+    return null;
+  }
 
   const spring = { type: "spring" as const, stiffness: 420, damping: 26 };
   const entryTransition = (delay: number) => ({ ...spring, delay });
@@ -67,7 +58,7 @@ export function SiteHeader({ className }: SiteHeaderProps) {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {/* Left: nombre como home (solo arriba, sin icono de casa) */}
+        {/* Left: nombre como home */}
         {atTop ? (
           <motion.div {...entry} transition={entryTransition(0)}>
             <Link
@@ -83,11 +74,15 @@ export function SiteHeader({ className }: SiteHeaderProps) {
           </motion.div>
         ) : null}
 
-        {/* Center: textos arriba, iconos al hacer scroll (estilo mobile dock) */}
-        <nav className="flex items-center gap-2 lg:gap-3">
-          {navItems.map((item, index) => {
-            const Icon = item.icon;
-            const active = pathname?.startsWith(item.href);
+        {/* Center: enlaces de navegación (solo desktop) */}
+        <nav className="hidden sm:flex items-center gap-6">
+          {[
+            { href: "/about", labelKey: "about" },
+            { href: "/web3", labelKey: "web3" },
+            { href: "/projects", labelKey: "projects" },
+          ].map((item, index) => {
+            const active = pathname === item.href || pathname.startsWith(`${item.href}/`);
+            const label = item.labelKey === "web3" ? t("web3Desktop") : t(item.labelKey);
             return (
               <motion.div
                 key={item.href}
@@ -99,32 +94,18 @@ export function SiteHeader({ className }: SiteHeaderProps) {
                   href={item.href}
                   prefetch
                   className={cn(
-                    "relative flex flex-col items-center gap-1 transition-all duration-300",
-                    atTop
-                      ? "text-zinc-900 hover:text-orange-500 dark:text-white"
-                      : "text-zinc-600 hover:text-orange-500 dark:text-zinc-400",
-                    active ? "text-orange-500 dark:text-orange-400" : "",
+                    "text-sm font-medium transition-colors",
+                    active ? "text-orange-500 dark:text-orange-400" : "text-zinc-600 hover:text-orange-500 dark:text-zinc-400 dark:hover:text-orange-400",
                   )}
                 >
-                  {atTop ? (
-                    <>
-                      <span className="transition-all duration-300 max-h-6 opacity-100">
-                        {navLabel(item.labelKey)}
-                      </span>
-                      <span className="absolute -bottom-1 left-0 h-px w-full origin-left scale-x-0 bg-orange-500 transition-transform duration-300 group-hover:scale-x-100" />
-                    </>
-                  ) : (
-                    <div className="flex h-9 w-9 items-center justify-center rounded-full border border-black/10 bg-white/60 text-zinc-900 shadow-sm dark:border-white/10 dark:bg-black/40 dark:text-white transition-colors hover:bg-orange-500/20">
-                      <Icon className="h-5 w-5" />
-                    </div>
-                  )}
+                  {label}
                 </Link>
               </motion.div>
             );
           })}
         </nav>
 
-        {/* Right: controls */}
+        {/* Right: controles (idioma, tema, precio) */}
         <div className="flex shrink-0 items-center gap-1">
           <motion.div {...entry} transition={entryTransition(0.15)}>
             <BlogControls />
