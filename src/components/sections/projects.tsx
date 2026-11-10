@@ -8,6 +8,7 @@ import { formatDistanceToNow } from "date-fns";
 import { GitHubContributions } from "./github-contributions";
 import { ScrollRevealStagger } from "@/components/ui/scroll-reveal-stagger";
 import { ScrollTyping } from "@/components/ui/scroll-typing";
+import { GlassDark, GlassCard, GlassButton } from "@/components/ui/glass-dark";
 import { useLocale } from "next-intl";
 import type { AppLocale } from "@/i18n/routing";
 
@@ -46,7 +47,7 @@ export function Projects({ projects }: ProjectsProps) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [isProjectsVisible, setIsProjectsVisible] = useState(false);
   const [atPageBottom, setAtPageBottom] = useState(false);
-  const [amaxingOpen, setAmaxingOpen] = useState(false);
+  const [calpulliOpen, setCalpulliOpen] = useState(false);
   const [xocoOpen, setXocoOpen] = useState(false);
   const [strawberryOpen, setStrawberryOpen] = useState(false);
   const latestProjects = projects.slice(0, 7);
@@ -129,117 +130,114 @@ export function Projects({ projects }: ProjectsProps) {
           <GitHubContributions username="driano7" />
         </div>
 
-        <div className="mt-8 rounded-[2rem] border border-violet-300/40 bg-zinc-100/75 p-5 dark:border-violet-500/25 dark:bg-zinc-950/80 md:p-6">
+        <GlassCard className="mt-8 border border-white/10 bg-zinc-900/30 p-5 md:p-6">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/50 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-700 dark:border-violet-400/40 dark:text-violet-300">
-              {isEs ? "Producto vivo v1.5.6 · Co-fundador & Full-stack" : "Live product v1.5.6 · Co-founder & Full-stack"}
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-zinc-400 dark:border-white/10 dark:text-zinc-300">
+              {isEs ? "Producto vivo · Co-fundador & Producto" : "Live product · Co-founder & Product"}
             </div>
             <DropdownIconButton
-              open={amaxingOpen}
-              onClick={() => setAmaxingOpen((prev) => !prev)}
-              ariaLabel={isEs ? "Desplegar información de Amaxing" : "Toggle Amaxing details"}
+              open={calpulliOpen}
+              onClick={() => setCalpulliOpen((prev) => !prev)}
+              ariaLabel={isEs ? "Desplegar información de Calpulli" : "Toggle Calpulli details"}
             />
           </div>
           <h3 className="text-2xl font-bold text-zinc-900 dark:text-white md:text-3xl">
-            {isEs ? "Amaxing — tours con alma local en CDMX" : "Amaxing — Local soul tours in Mexico City"}
+            {isEs ? "Calpulli CDMX — tours con alma local en CDMX" : "Calpulli CDMX — Local soul tours in Mexico City"}
           </h3>
           <p className="mt-3 max-w-5xl text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 md:text-base">
             {isEs
-              ? "Amaxing es mi proyecto vivo: dos historias cruzadas en la CDMX — un oaxaqueño que la camina todos los días y un defeño que la extraña a la distancia (yo) — para mostrar la ciudad real, sin trampas para turistas. 12 experiencias curadas en 4 categorías (Submundo Culinario · Historia Sin Censura · Inmersiones en Barrios · Arte & Museos) para viajeros solos o grupos pequeños (máx. 6–12), comer donde comen los locales, barrios con nombre y ese surrealismo que solo se entiende caminando con un local."
-              : "Amaxing is my live project: two stories crossing in CDMX — an Oaxaqueño who walks it every day and a defeño who misses it from afar (me) — to show the real city with zero tourist traps. 12 curated experiences across 4 categories (Culinary Underworld · Uncensored History · Neighborhood Deep Dives · Art & Museums) for solo travelers and small groups (max 6–12), eating where locals eat, neighborhoods with history and that surrealism you only get by walking it with a local."}
+              ? "Calpulli nace del cruce de dos historias en la Ciudad de México: uno de nosotros vive aquí y la camina todos los días; el otro la mira desde lejos y con ganas. Juntos diseñamos recorridos a pie en grupos pequeños — comida callejera, historia, barrios y museos — guiados por locales que conocen la ciudad real, sin trampas para turistas. 'Calpulli' es la palabra náhuatl para el barrio: la ciudad vivida como vecindario, con la gente que la habita."
+              : "Calpulli was born from two stories crossing in Mexico City: one of us lives here and walks it every day; the other sees it from afar and misses it. Together we design small-group walking journeys — street food, history, neighborhoods and museums — led by locals who know the real city, with zero tourist traps. 'Calpulli' is the Nahuatl word for the barrio: the city lived as a neighborhood, with the people who inhabit it."}
           </p>
-          {amaxingOpen ? (
-            <div className="defi-dropdown-reveal">
+          {calpulliOpen ? (
+            <GlassDark className="defi-dropdown-reveal mt-3 p-4 border-white/5 bg-zinc-900/20">
               <p className="mt-3 max-w-5xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 md:text-base">
                 {isEs
-                  ? "Propósito: reivindicar lo chilango como hospitalidad, no insulto — sabores, lugares, olores y surrealismo. Operamos 12 tours: Street Food Centro / Mole Coyoacán / Mezcal & Pulque · Templo Mayor / Bellas Artes / Chapultepec · Coyoacán Frida & Diego / Roma-Condesa / Xochimilco · Antropología / Arte Moderno-Tamayo / MUAC. Además: 5 Journeys autoguiados (Condesa · Centro Palacios · Chapultepec II Agua · Chimalistac · UNAM Murales, 60–80 min, MDX bilingüe) + 5 mapas interactivos CDMX (Comida Tradicional · Zonas Precaución con datos SESNSP/C5 · Vida Nocturna · Joyas Escondidas · Top Atracciones, My Maps embebido) + Local Picks mensual curado por chilangos con IA (OpenRouter Nemotron 120B + NewsAPI + FRED, 8 picks/mes, máx. 9 MDX, fotos locales en /static/images/local-picks)."
-                  : "Purpose: reclaiming chilango as hospitality, not insult — flavors, places, smells and surrealism. We run 12 tours: Street Food Downtown / Mole Coyoacán / Mezcal & Pulque · Templo Mayor / Bellas Artes / Chapultepec · Coyoacán Frida & Diego / Roma-Condesa / Xochimilco · Anthropology / Modern Art-Tamayo / MUAC. Plus: 5 self-guided Journeys (Condesa · Palace District · Chapultepec II Water · Chimalistac · UNAM Murals, 60–80 min, bilingual MDX) + 5 interactive CDMX maps (Traditional Food · Caution Zones w/ SESNSP/C5 data · Nightlife · Hidden Gems · Top Attractions, embedded My Maps) + monthly Local Picks by chilangos via AI (OpenRouter Nemotron 120B + NewsAPI + FRED, 8 picks/mo, max 9 MDX, local images in /static/images/local-picks)."}
+                  ? "Qué ofrecemos: journeys bookables en grupos pequeños (Luchas, Centro Histórico, Antropología, Chapultepec, Jamaica, Roma & Condesa, Coyoacán), con entrada resuelta y punto de encuentro confirmado al reservar. También walks autoguiados gratuitos (60–90 min), mapas interactivos de la CDMX y Local Picks mensuales con lo mejor de la ciudad."
+                  : "What we offer: bookable journeys in small groups (Luchas, Centro Histórico, Anthropology, Chapultepec, Jamaica, Roma & Condesa, Coyoacán), with entry logistics solved and meeting point confirmed on booking. Also free self-guided walks (60–90 min), interactive CDMX maps and monthly Local Picks with the best of the city."}
               </p>
               <p className="mt-2 max-w-5xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 md:text-base">
                 {isEs ? (
                   <>
-                    Lo que hago: ownership full-stack — Next.js 12 (Pages Router) + React 17 + TypeScript + Tailwind 3 + Framer Motion + Supabase (auth/reservas/analytics) + Stripe Checkout (test 4242) + cripto Ethereum/Base/Lightning con verificación on-chain (Etherscan/Basescan, polling 5s) + QRs minimalistas{" "}
-                    <span className="font-mono text-xs">AMX-T-</span> / <span className="font-mono text-xs">AMX-C-</span> con lector ZXing + BarcodeDetector + mdx-bundler (guides/maps/local) + Recharts 2 + AES-256-GCM (Web Crypto client + PBKDF2 server) + i18n ES/EN + roles por env ADMIN/EMPLOYEE + analítica pasiva + panel socio con métricas ML (segmentación, proyección 7/14/30d, demanda por tour, top slots, anomalías z-score). Vive en{" "}
-                    <Link
-                      href="https://amaxing-amx.vercel.app/about"
+                    La experiencia incluye un{" "}
+                    <span className="font-mono text-xs">chatbot flotante</span> estilo WhatsApp (Calpulli AI) que te guía en tiempo real: qué hacer hoy, recomendaciones de comida, si es seguro moverse o cómo reservar un journey. Todo pensado para que planees tu visita como si te lo contara un amigo local. Los QRs de check-in y el panel de reserva cierran el círculo desde el mensaje hasta la puerta del lugar.
+                    <br />
+                    <br />
+                    Vive en{" "}
+                    <a
+                      href="[DOMINIO_CALPULLI]"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="underline hover:text-zinc-900 dark:hover:text-zinc-200"
                     >
-                      amaxing-amx.vercel.app
-                    </Link>
+                      [DOMINIO_CALPULLI]
+                    </a>
                     {" — "}el abrazo de la ciudad que amamos.
                   </>
                 ) : (
                   <>
-                    What I do: full-stack ownership — Next.js 12 (Pages Router) + React 17 + TypeScript + Tailwind 3 + Framer Motion + Supabase (auth/bookings/analytics) + Stripe Checkout (test 4242) + crypto Ethereum/Base/Lightning with on-chain verification (Etherscan/Basescan, 5s polling) + minimal QRs{" "}
-                    <span className="font-mono text-xs">AMX-T-</span> / <span className="font-mono text-xs">AMX-C-</span> with ZXing + BarcodeDetector scanner + mdx-bundler (guides/maps/local) + Recharts 2 + AES-256-GCM (Web Crypto client + PBKDF2 server) + i18n EN/ES + env-based ADMIN/EMPLOYEE roles + passive analytics + partner dashboard with ML metrics (segmentation, 7/14/30d forecast, demand by tour, top slots, z-score anomalies). Live at{" "}
-                    <Link
-                      href="https://amaxing-amx.vercel.app/about"
+                    The experience includes a floating{" "}
+                    <span className="font-mono text-xs">WhatsApp-style chatbot</span> (Calpulli AI) that guides you in real time: what to do today, food recommendations, safety tips, or how to book a journey. Everything designed so you plan your visit as if a local friend were telling you. QR check-in and the booking panel close the loop from message to doorstep.
+                    <br />
+                    <br />
+                    Live at{" "}
+                    <a
+                      href="[DOMINIO_CALPULLI]"
                       target="_blank"
                       rel="noopener noreferrer"
                       className="underline hover:text-zinc-900 dark:hover:text-zinc-200"
                     >
-                      amaxing-amx.vercel.app
-                    </Link>
+                      [DOMINIO_CALPULLI]
+                    </a>
                     {" — "}the embrace of the city we love.
                   </>
                 )}
               </p>
-              <div className="mt-3 flex flex-wrap gap-1.5">
-                <span className="rounded-full border border-violet-300/40 bg-white/60 px-2.5 py-1 text-[11px] font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-400">Next.js 12</span>
-                <span className="rounded-full border border-violet-300/40 bg-white/60 px-2.5 py-1 text-[11px] font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-400">Supabase</span>
-                <span className="rounded-full border border-violet-300/40 bg-white/60 px-2.5 py-1 text-[11px] font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-400">Stripe + Crypto</span>
-                <span className="rounded-full border border-violet-300/40 bg-white/60 px-2.5 py-1 text-[11px] font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-400">MDX</span>
-                <span className="rounded-full border border-violet-300/40 bg-white/60 px-2.5 py-1 text-[11px] font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-400">OpenRouter IA</span>
-                <span className="rounded-full border border-violet-300/40 bg-white/60 px-2.5 py-1 text-[11px] font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-400">Recharts ML</span>
-                <span className="rounded-full border border-violet-300/40 bg-white/60 px-2.5 py-1 text-[11px] font-medium text-zinc-600 dark:border-zinc-700 dark:bg-zinc-900/60 dark:text-zinc-400">AES-GCM</span>
-              </div>
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                <Link
-                  href="https://amaxing-amx.vercel.app"
+                <GlassButton
+                  href="[DOMINIO_CALPULLI]"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-xs text-zinc-200 transition-colors hover:border-violet-400/50 hover:text-white"
+                  accent="violet"
                 >
-                  {isEs ? "Ver Amaxing en vivo" : "Visit Amaxing live"}
+                  {isEs ? "Ver Calpulli en vivo" : "Visit Calpulli live"}
                   <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-                <Link
-                  href="https://amaxing-amx.vercel.app/tours"
+                </GlassButton>
+                <GlassButton
+                  href="[DOMINIO_CALPULLI]/journeys"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-xs text-zinc-200 transition-colors hover:border-violet-400/50 hover:text-white"
+                  accent="violet"
                 >
-                  {isEs ? "12 tours curados" : "12 curated tours"}
+                  {isEs ? "Journeys bookables" : "Bookable journeys"}
                   <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-                <Link
-                  href="https://amaxing-amx.vercel.app/about"
+                </GlassButton>
+                <GlassButton
+                  href="[DOMINIO_CALPULLI]/about"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-xs text-zinc-200 transition-colors hover:border-violet-400/50 hover:text-white"
+                  accent="violet"
                 >
-                  {isEs ? "Nuestra historia" : "Our story"}
+                  {isEs ? "Quiénes somos" : "About us"}
                   <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-                <Link
-                  href="https://github.com/driano7/amaxing"
+                </GlassButton>
+                <GlassButton
+                  href="https://github.com/driano7/calpulli"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-xs text-zinc-200 transition-colors hover:border-violet-400/50 hover:text-white"
+                  accent="violet"
                 >
-                  GitHub — driano7/amaxing
+                  GitHub — driano7/calpulli
                   <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
+                </GlassButton>
               </div>
-            </div>
+            </GlassDark>
           ) : null}
-        </div>
+        </GlassCard>
 
-        <div className="mt-8 rounded-[2rem] border border-violet-300/40 bg-zinc-100/75 p-5 dark:border-violet-500/25 dark:bg-zinc-950/80 md:p-6">
+        <GlassCard className="mt-8 border border-white/10 bg-zinc-900/30 p-5 md:p-6">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/50 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-700 dark:border-violet-400/40 dark:text-violet-300">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-zinc-400 dark:border-white/10 dark:text-zinc-300">
               {isEs ? "Proyecto en desarrollo" : "Project in progress"}
             </div>
             <DropdownIconButton
@@ -259,50 +257,50 @@ export function Projects({ projects }: ProjectsProps) {
               : "A project I have been building over the last few months. Xoco Suite is an integrated software product for restaurants and food businesses that connects website, client app, and point of sale in one architecture. The POS is directly integrated with the client app to sync orders in real time and enable continuous operations across service, kitchen, and support."}
           </p>
           {xocoOpen ? (
-            <div className="defi-dropdown-reveal">
+            <GlassDark className="defi-dropdown-reveal mt-3 p-4 border-white/5 bg-zinc-900/20">
               <p className="mt-3 max-w-5xl text-sm leading-relaxed text-zinc-600 dark:text-zinc-400 md:text-base">
                 {isEs
                   ? "La solución incorpora métricas avanzadas, gestión de higiene y cumplimiento alineada a organismos gubernamentales, y una capa de pagos moderna: gracias al acuerdo con "
                   : "The solution includes advanced metrics, hygiene and compliance management aligned with government entities, and a modern payment layer: thanks to an agreement with "}
-                <Link
+                <a
                   href="https://blokko.io"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="underline hover:text-zinc-900 dark:hover:text-zinc-200"
                 >
                   blokko.io
-                </Link>
+                </a>
                 {isEs
                   ? ", permite recibir pagos en cripto o en rieles latinoamericanos como PIX, SPEI y Mercado Libre, con liquidación al día siguiente en moneda local, bajo una experiencia equivalente a una transacción con tarjeta Visa o Master card."
                   : ", it supports crypto payments and LATAM payment rails such as PIX, SPEI, and Mercado Libre, with next-day settlement in local currency under an experience equivalent to a Visa or Master card transaction."}
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                <Link
+                <GlassButton
                   href="https://v0-xoco-suite-landing.vercel.app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-xs text-zinc-200 transition-colors hover:border-violet-400/50 hover:text-white"
+                  accent="violet"
                 >
                   {isEs ? "Landing Xoco Suite" : "Xoco Suite landing"}
                   <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-                <Link
+                </GlassButton>
+                <GlassButton
                   href="https://xococafe.site"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-xs text-zinc-200 transition-colors hover:border-violet-400/50 hover:text-white"
+                  accent="violet"
                 >
                   {isEs ? "Demo app cliente" : "Client app demo"}
                   <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
+                </GlassButton>
               </div>
-            </div>
+            </GlassDark>
           ) : null}
-        </div>
+        </GlassCard>
 
-        <div className="mt-8 rounded-[2rem] border border-violet-300/40 bg-zinc-100/75 p-5 dark:border-violet-500/25 dark:bg-zinc-950/80 md:p-6">
+        <GlassCard className="mt-8 border border-white/10 bg-zinc-900/30 p-5 md:p-6">
           <div className="mb-3 flex items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-violet-400/50 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-700 dark:border-violet-400/40 dark:text-violet-300">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-zinc-400 dark:border-white/10 dark:text-zinc-300">
               {isEs ? "Proyecto conceptual" : "Concept project"}
             </div>
             <DropdownIconButton
@@ -317,7 +315,7 @@ export function Projects({ projects }: ProjectsProps) {
               : "Strawberry Wallet + ZK Proofs"}
           </h3>
           {strawberryOpen ? (
-            <div className="defi-dropdown-reveal">
+            <GlassDark className="defi-dropdown-reveal mt-3 p-4 border-white/5 bg-zinc-900/20">
               <p className="mt-3 max-w-5xl text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 md:text-base">
                 {isEs
                   ? "Concepto de wallet enfocada en privacidad y usabilidad. Usa Zero-Knowledge Proofs para validar información sin exponer datos sensibles."
@@ -329,28 +327,28 @@ export function Projects({ projects }: ProjectsProps) {
                   : "Goal: stronger operational security with a better user experience for Web3 payments and transfers."}
               </p>
               <div className="mt-4 flex flex-wrap items-center gap-2">
-                <Link
+                <GlassButton
                   href="https://strawberrywallet.netlify.app"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-xs text-zinc-200 transition-colors hover:border-violet-400/50 hover:text-white"
+                  accent="violet"
                 >
                   {isEs ? "Abrir app Strawberry" : "Open Strawberry app"}
                   <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
-                <Link
+                </GlassButton>
+                <GlassButton
                   href="https://github.com/driano7/StrawberryWallet"
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-zinc-700 bg-zinc-900/60 px-3 py-2 text-xs text-zinc-200 transition-colors hover:border-violet-400/50 hover:text-white"
+                  accent="violet"
                 >
                   {isEs ? "Repo Strawberry Wallet" : "Strawberry Wallet repo"}
                   <ArrowUpRight className="h-3.5 w-3.5" />
-                </Link>
+                </GlassButton>
               </div>
-            </div>
+            </GlassDark>
           ) : null}
-        </div>
+        </GlassCard>
 
         <div className="mt-12 mb-6 flex items-center justify-between gap-3">
           <h3 className="text-2xl font-bold text-zinc-900 dark:text-white md:text-3xl">
