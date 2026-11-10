@@ -77,21 +77,29 @@ void main() {
   // Domain warping for organic liquid eddies
   float warp1 = vnoise(vec2(u_scaled * 1.15 + t * 0.07, v_scaled * 1.15 - t * 0.06)) * 0.09;
   float warp2 = vnoise(vec2(u_scaled * 1.25 - t * 0.06, v_scaled * 1.25 + t * 0.07)) * 0.08;
+  float warp3 = vnoise(vec2(u_scaled * 1.05 + t * 0.05, v_scaled * 0.95 - t * 0.04)) * 0.10;
 
-  // --- WAVE 1: Sweeps along the left quadrant ---
+  // --- WAVE 1: Left quadrant (vertical curve) ---
   float wave1_base = mix(-0.50, -0.32, isPortrait);
   float curve1_x = wave1_base - breath + 0.21 * cos(v_scaled * 2.7 + t * 0.14)
                    + 0.07 * sin(v_scaled * 4.1 - t * 0.09) + warp1;
   float d1 = u_scaled - curve1_x;
 
-  // --- WAVE 2: Sweeps across the lower-right quadrant ---
+  // --- WAVE 2: Lower-right quadrant (horizontal curve) ---
   float wave2_base = mix(0.24, 0.26, isPortrait);
   float curve2_y = wave2_base + breath + 0.17 * sin(u_scaled * 2.2 - t * 0.15)
                    + 0.06 * cos(u_scaled * 1.2 + t * 0.11) + warp2;
   float d2 = v_scaled - curve2_y;
   float mask2 = clamp((u_scaled + mix(0.35, 0.30, isPortrait)) * 1.8, 0.0, 1.0);
 
-  // Brand colors: Purple, Blue, White (instead of Pink, Blue, White)
+  // --- WAVE 3: Top center (horizontal curve, completes the triangle) ---
+  float wave3_base = mix(-0.32, -0.22, isPortrait);
+  float curve3_y = wave3_base + breath + 0.16 * cos(u_scaled * 2.0 + t * 0.13)
+                   + 0.05 * sin(u_scaled * 3.4 - t * 0.10) + warp3;
+  float d3 = v_scaled - curve3_y;
+  float mask3 = clamp((-v_scaled + 0.18) * 2.2, 0.0, 1.0);
+
+  // Brand colors: Purple, Blue, White
   vec3 PURPLE   = vec3(0.482, 0.169, 0.851); // #7B2BD9
   vec3 CORE_WHITE = vec3(0.985, 0.995, 1.000);
   vec3 ELEC_BLUE  = vec3(0.237, 0.510, 0.969); // #3C82F7-ish
@@ -119,11 +127,22 @@ void main() {
   float purpleLip2 = (exp(-pow((d2 - 0.040) / 0.040, 2.0)) * 0.85
                    + exp(-pow((d2 - 0.075) / 0.060, 2.0)) * 0.25) * mask2;
 
+  // Wave 3 fields (top)
+  float core3 = exp(-pow(d3 / 0.026, 2.0)) * mask3;
+  float coreHalo3 = exp(-pow(d3 / 0.064, 2.0)) * 0.55 * mask3;
+
+  float purpleLip3 = (exp(-pow((d3 - 0.045) / 0.042, 2.0)) * 0.90
+                   + exp(-pow((d3 + 0.070) / 0.058, 2.0)) * 0.30) * mask3;
+
+  float blueBody3 = (exp(-pow((d3 + 0.050) / 0.068, 2.0)) * 0.95
+                  + exp(-pow((d3 + 0.120) / 0.105, 2.0)) * 0.60
+                  + exp(-pow((d3 + 0.210) / 0.155, 2.0)) * 0.28) * mask3;
+
   // --- Dark Mode Rendering (Luminous waves over pure black) ---
   vec3 colDark = vec3(0.0);
-  colDark += CORE_WHITE * (core1 * 1.25 + coreHalo1 * 0.6 + core2 * 1.25 + coreHalo2 * 0.6);
-  colDark += PURPLE * (purpleLip1 + purpleLip2);
-  float totalBlue = blueBody1 + blueBody2;
+  colDark += CORE_WHITE * (core1 * 1.25 + coreHalo1 * 0.6 + core2 * 1.25 + coreHalo2 * 0.6 + core3 * 1.25 + coreHalo3 * 0.6);
+  colDark += PURPLE * (purpleLip1 + purpleLip2 + purpleLip3);
+  float totalBlue = blueBody1 + blueBody2 + blueBody3;
   colDark += ELEC_BLUE * vec3(totalBlue * 0.85, totalBlue * 0.85, totalBlue * 1.05);
 
   // --- Light Mode Rendering (Atmospheric luminous ribbons over warm bone) ---
@@ -131,9 +150,9 @@ void main() {
   // Blend blue fluid body
   colLight = mix(colLight, vec3(0.08, 0.38, 0.90), clamp(totalBlue * 0.55, 0.0, 1.0));
   // Blend purple accent rim
-  colLight = mix(colLight, PURPLE, clamp((purpleLip1 + purpleLip2) * 0.65, 0.0, 1.0));
+  colLight = mix(colLight, PURPLE, clamp((purpleLip1 + purpleLip2 + purpleLip3) * 0.65, 0.0, 1.0));
   // Blend luminous core highlight
-  colLight = mix(colLight, vec3(1.0, 1.0, 1.0), clamp((core1 + core2) * 0.8, 0.0, 1.0));
+  colLight = mix(colLight, vec3(1.0, 1.0, 1.0), clamp((core1 + core2 + core3) * 0.8, 0.0, 1.0));
 
   // --- Smooth atmospheric transition between dark and light ---
   vec3 col = mix(colDark, colLight, u_themeProgress);
@@ -403,6 +422,13 @@ export function HeroShader({ className }: HeroShaderProps) {
             style={{
               background:
                 'radial-gradient(circle, rgba(59,130,246,0.55) 0%, rgba(123,43,217,0.25) 50%, transparent 75%)',
+            }}
+          />
+          <div
+            className="absolute top-0 left-1/3 h-[55vw] w-[55vw] rounded-full opacity-45 blur-[110px]"
+            style={{
+              background:
+                'radial-gradient(circle, rgba(255,255,255,0.30) 0%, rgba(123,43,217,0.20) 50%, transparent 70%)',
             }}
           />
         </div>

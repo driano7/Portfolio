@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion, useInView } from "framer-motion";
 import type { Repository } from "@/app/projects/page";
 import Link from "next/link";
 import { ArrowUpRight, CalendarClock, ChevronDown, ChevronUp, GitFork, Globe2, Star } from "lucide-react";
@@ -53,6 +54,19 @@ export function Projects({ projects }: ProjectsProps) {
   const latestProjects = projects.slice(0, 7);
   const getDisplayProjectName = (name: string) =>
     name.toLowerCase() === "portoflio" ? "Portfolio" : name;
+
+  // Refs y visibilidad para animaciones de scroll
+  const githubRef = useRef<HTMLDivElement | null>(null);
+  const isGitHubVisible = useInView(githubRef, { amount: 0.15, once: true });
+
+  const calpulliRef = useRef<HTMLDivElement | null>(null);
+  const isCalpulliVisible = useInView(calpulliRef, { amount: 0.15, once: true });
+
+  const xocoRef = useRef<HTMLDivElement | null>(null);
+  const isXocoVisible = useInView(xocoRef, { amount: 0.15, once: true });
+
+  const strawberryRef = useRef<HTMLDivElement | null>(null);
+  const isStrawberryVisible = useInView(strawberryRef, { amount: 0.15, once: true });
 
   useEffect(() => {
     const handleScroll = () => {
@@ -122,28 +136,41 @@ export function Projects({ projects }: ProjectsProps) {
           </ScrollTyping>
         </div>
 
-        <div className="rounded-[2rem] border border-violet-300/40 bg-zinc-100/70 p-4 dark:border-violet-500/20 dark:bg-zinc-950/70 md:p-6">
+        <motion.div
+          ref={githubRef}
+          initial={{ opacity: 0, y: 30 }}
+          animate={isGitHubVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="rounded-[2rem] border border-violet-300/40 bg-zinc-100/70 p-4 dark:border-violet-500/20 dark:bg-zinc-950/70 md:p-6"
+        >
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-violet-400/50 bg-violet-500/10 px-3 py-1 text-xs font-semibold text-violet-700 dark:border-violet-400/40 dark:text-violet-300">
             <CalendarClock className="h-3.5 w-3.5" />
             {isEs ? "Contribuciones de GitHub" : "GitHub Contributions"}
           </div>
           <GitHubContributions username="driano7" />
-        </div>
+        </motion.div>
 
-        <GlassCard className="mt-8 border border-white/10 bg-zinc-900/30 p-5 md:p-6">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-zinc-400 dark:border-white/10 dark:text-zinc-300">
-              {isEs ? "Producto vivo · Co-fundador & Producto" : "Live product · Co-founder & Product"}
+        <motion.div
+          ref={calpulliRef}
+          initial={{ opacity: 0, y: -30 }}
+          animate={isCalpulliVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: -30 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="mt-8 border border-white/10 bg-zinc-900/30 p-5 md:p-6"
+        >
+          <GlassCard className="border-none bg-transparent p-0 md:p-0 shadow-none">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-zinc-400 dark:border-white/10 dark:text-zinc-300">
+                {isEs ? "Producto vivo · Co-fundador & Producto" : "Live product · Co-founder & Product"}
+              </div>
+              <DropdownIconButton
+                open={calpulliOpen}
+                onClick={() => setCalpulliOpen((prev) => !prev)}
+                ariaLabel={isEs ? "Desplegar información de Calpulli" : "Toggle Calpulli details"}
+              />
             </div>
-            <DropdownIconButton
-              open={calpulliOpen}
-              onClick={() => setCalpulliOpen((prev) => !prev)}
-              ariaLabel={isEs ? "Desplegar información de Calpulli" : "Toggle Calpulli details"}
-            />
-          </div>
-          <h3 className="text-2xl font-bold text-zinc-900 dark:text-white md:text-3xl">
-            {isEs ? "Calpulli CDMX — tours con alma local en CDMX" : "Calpulli CDMX — Local soul tours in Mexico City"}
-          </h3>
+            <h3 className="text-2xl font-bold text-zinc-900 dark:text-white md:text-3xl">
+              {isEs ? "Calpulli CDMX — tours con alma local en CDMX" : "Calpulli CDMX — Local soul tours in Mexico City"}
+            </h3>
           <p className="mt-3 max-w-5xl text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 md:text-base">
             {isEs
               ? "Calpulli nace del cruce de dos historias en la Ciudad de México: uno de nosotros vive aquí y la camina todos los días; el otro la mira desde lejos y con ganas. Juntos diseñamos recorridos a pie en grupos pequeños — comida callejera, historia, barrios y museos — guiados por locales que conocen la ciudad real, sin trampas para turistas. 'Calpulli' es la palabra náhuatl para el barrio: la ciudad vivida como vecindario, con la gente que la habita."
@@ -233,24 +260,32 @@ export function Projects({ projects }: ProjectsProps) {
               </div>
             </GlassDark>
           ) : null}
-        </GlassCard>
+          </GlassCard>
+        </motion.div>
 
-        <GlassCard className="mt-8 border border-white/10 bg-zinc-900/30 p-5 md:p-6">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-zinc-400 dark:border-white/10 dark:text-zinc-300">
-              {isEs ? "Proyecto en desarrollo" : "Project in progress"}
+        <motion.div
+          ref={xocoRef}
+          initial={{ opacity: 0, y: 30 }}
+          animate={isXocoVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="mt-8 border border-white/10 bg-zinc-900/30 p-5 md:p-6"
+        >
+          <GlassCard className="border-none bg-transparent p-0 md:p-0 shadow-none">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-zinc-400 dark:border-white/10 dark:text-zinc-300">
+                {isEs ? "Proyecto en desarrollo" : "Project in progress"}
+              </div>
+              <DropdownIconButton
+                open={xocoOpen}
+                onClick={() => setXocoOpen((prev) => !prev)}
+                ariaLabel={isEs ? "Desplegar información de Xoco Suite" : "Toggle Xoco Suite details"}
+              />
             </div>
-            <DropdownIconButton
-              open={xocoOpen}
-              onClick={() => setXocoOpen((prev) => !prev)}
-              ariaLabel={isEs ? "Desplegar información de Xoco Suite" : "Toggle Xoco Suite details"}
-            />
-          </div>
-          <h3 className="text-2xl font-bold text-zinc-900 dark:text-white md:text-3xl">
-            {isEs
-              ? "Xoco Suite - POS, métricas avanzadas y app cliente"
-              : "Xoco Suite - POS, advanced metrics, and client app"}
-          </h3>
+            <h3 className="text-2xl font-bold text-zinc-900 dark:text-white md:text-3xl">
+              {isEs
+                ? "Xoco Suite - POS, métricas avanzadas y app cliente"
+                : "Xoco Suite - POS, advanced metrics, and client app"}
+            </h3>
           <p className="mt-3 max-w-5xl text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 md:text-base">
             {isEs
               ? "Proyecto en el que he estado trabajando durante los últimos meses. Xoco Suite es un software integral para restaurantes y negocios de alimentos que conecta sitio web, app de cliente y punto de venta en una sola arquitectura de producto. El POS se integra directamente con la app de cliente para sincronizar pedidos en tiempo real y habilitar una operación continua entre atención, cocina y servicio."
@@ -296,24 +331,32 @@ export function Projects({ projects }: ProjectsProps) {
               </div>
             </GlassDark>
           ) : null}
-        </GlassCard>
+          </GlassCard>
+        </motion.div>
 
-        <GlassCard className="mt-8 border border-white/10 bg-zinc-900/30 p-5 md:p-6">
-          <div className="mb-3 flex items-center justify-between gap-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-zinc-400 dark:border-white/10 dark:text-zinc-300">
-              {isEs ? "Proyecto conceptual" : "Concept project"}
+        <motion.div
+          ref={strawberryRef}
+          initial={{ opacity: 0, y: -30 }}
+          animate={isStrawberryVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: -30 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
+          className="mt-8 border border-white/10 bg-zinc-900/30 p-5 md:p-6"
+        >
+          <GlassCard className="border-none bg-transparent p-0 md:p-0 shadow-none">
+            <div className="mb-3 flex items-center justify-between gap-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/5 px-3 py-1 text-xs font-semibold text-zinc-400 dark:border-white/10 dark:text-zinc-300">
+                {isEs ? "Proyecto conceptual" : "Concept project"}
+              </div>
+              <DropdownIconButton
+                open={strawberryOpen}
+                onClick={() => setStrawberryOpen((prev) => !prev)}
+                ariaLabel={isEs ? "Desplegar información de Strawberry Wallet" : "Toggle Strawberry Wallet details"}
+              />
             </div>
-            <DropdownIconButton
-              open={strawberryOpen}
-              onClick={() => setStrawberryOpen((prev) => !prev)}
-              ariaLabel={isEs ? "Desplegar información de Strawberry Wallet" : "Toggle Strawberry Wallet details"}
-            />
-          </div>
-          <h3 className="text-2xl font-bold text-zinc-900 dark:text-white md:text-3xl">
-            {isEs
-              ? "Strawberry Wallet + ZK Proofs"
-              : "Strawberry Wallet + ZK Proofs"}
-          </h3>
+            <h3 className="text-2xl font-bold text-zinc-900 dark:text-white md:text-3xl">
+              {isEs
+                ? "Strawberry Wallet + ZK Proofs"
+                : "Strawberry Wallet + ZK Proofs"}
+            </h3>
           {strawberryOpen ? (
             <GlassDark className="defi-dropdown-reveal mt-3 p-4 border-white/5 bg-zinc-900/20">
               <p className="mt-3 max-w-5xl text-sm leading-relaxed text-zinc-700 dark:text-zinc-300 md:text-base">
@@ -348,7 +391,8 @@ export function Projects({ projects }: ProjectsProps) {
               </div>
             </GlassDark>
           ) : null}
-        </GlassCard>
+          </GlassCard>
+        </motion.div>
 
         <div className="mt-12 mb-6 flex items-center justify-between gap-3">
           <h3 className="text-2xl font-bold text-zinc-900 dark:text-white md:text-3xl">
